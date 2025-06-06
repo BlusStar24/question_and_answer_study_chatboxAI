@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'user_management_view.dart';
 import 'request_management_view.dart';
 import 'custom_bottom_navigation.dart';
@@ -26,6 +27,18 @@ class _AdminScreenState extends State<AdminScreen> {
 
   void _navigateToRequestManagement() {
     setState(() => _currentIndex = 2); // Chuyển đến tab Yêu cầu
+  }
+
+  // Hàm đăng xuất
+  Future<void> _logout() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('userId');
+      print('UserId removed from SharedPreferences');
+    } catch (e) {
+      print('Error accessing SharedPreferences: $e');
+    }
+    Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
   }
 
   @override
@@ -56,8 +69,8 @@ class _AdminScreenState extends State<AdminScreen> {
                     Text(
                       _tabs[_currentIndex].title,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                     const Spacer(),
                     IconButton(
@@ -66,11 +79,24 @@ class _AdminScreenState extends State<AdminScreen> {
                         color: Color.fromARGB(255, 193, 231, 215),
                       ),
                       onPressed: () {
-                        // Navigate back to AdminScreen (self) to reset view
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const AdminScreen(),
+                        showDialog(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Xác nhận đăng xuất'),
+                            content: const Text('Bạn có chắc muốn đăng xuất?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Hủy'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context); // Đóng dialog
+                                  _logout(); // Gọi hàm đăng xuất
+                                },
+                                child: const Text('Đăng xuất'),
+                              ),
+                            ],
                           ),
                         );
                       },
@@ -205,18 +231,18 @@ class OverviewTab extends StatelessWidget {
                     Text(
                       item.title,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.deepPurple.shade800,
-                      ),
+                            fontWeight: FontWeight.w700,
+                            color: Colors.deepPurple.shade800,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 6),
                     Text(
                       item.subtitle,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.deepPurple.shade400,
-                        fontWeight: FontWeight.w500,
-                      ),
+                            color: Colors.deepPurple.shade400,
+                            fontWeight: FontWeight.w500,
+                          ),
                       textAlign: TextAlign.center,
                     ),
                   ],

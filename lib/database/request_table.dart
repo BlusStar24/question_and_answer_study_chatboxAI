@@ -156,6 +156,17 @@ class RequestDBHelper {
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
   }
 
+  Future<Request?> getRequestById(int requestId) async {
+    final box = await Hive.openBox<Request>('requests');
+    try {
+      return box.values.firstWhere(
+        (request) => request.requestId == requestId && !request.isDeleted,
+      );
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<void> insertBannedWord(BannedWord bannedWord) async {
     await DBHelper().initHive();
     final box = Hive.box<BannedWord>('banned_words');

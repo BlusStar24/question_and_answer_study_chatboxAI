@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:hive/hive.dart';
 import 'new_question_form.dart';
 import 'faq_list_view.dart';
 import '../../database/box_chat_table.dart';
 import '../../database/student_table.dart';
+import '../../database/request_table.dart'; 
 import '../../database/models.dart';
 import '../../chat_view.dart';
 import '../student/form_downloads_view.dart';
@@ -110,7 +112,7 @@ class _StudentScreenState extends State<StudentScreen> {
         context,
         MaterialPageRoute(builder: (context) => const DownloadFormsScreen()),
       );
-    } else {}
+    }
   }
 
   String normalizeMajor(String major) {
@@ -118,7 +120,7 @@ class _StudentScreenState extends State<StudentScreen> {
     if (normalized == 'congnghethongtin') return 'Công nghệ thông tin';
     if (normalized == 'tritunhantao') return 'Trí tuệ nhân tạo';
     if (normalized == 'kythuatphanmem') return 'Kỹ thuật phần mềm';
-    return 'Công nghệ thông tin'; // Giá trị mặc định
+    return 'Công nghệ thông tin';
   }
 
   Future<String> askAI(String question, String major) async {
@@ -433,178 +435,178 @@ class _StudentScreenState extends State<StudentScreen> {
                         ),
                       )
                     : _student == null
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.error_outline,
-                              size: 80,
-                              color: Color(0xFFFBC02D),
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Không tìm thấy thông tin sinh viên.',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                                fontSize: 18,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 200,
-                              decoration: const BoxDecoration(
-                                gradient: LinearGradient(
-                                  colors: [
-                                    Color(0xFF1976D2),
-                                    Color(0xFF42A5F5),
-                                  ],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  size: 80,
+                                  color: Color(0xFFFBC02D),
                                 ),
-                              ),
-                              child: Center(
-                                child: CircleAvatar(
-                                  radius: 60,
-                                  backgroundImage:
-                                      _student!.profileImage.isNotEmpty
-                                      ? NetworkImage(_student!.profileImage)
-                                      : null,
-                                  backgroundColor: Colors.white,
-                                  child: _student!.profileImage.isEmpty
-                                      ? const Icon(
-                                          Icons.person,
-                                          size: 60,
-                                          color: Color(0xFF1976D2),
-                                        )
-                                      : null,
+                                const SizedBox(height: 16),
+                                const Text(
+                                  'Không tìm thấy thông tin sinh viên.',
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                    fontSize: 18,
+                                    color: Colors.black54,
+                                  ),
                                 ),
-                              ),
+                              ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Card(
-                                elevation: 4,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(16),
-                                    gradient: const LinearGradient(
+                          )
+                        : SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 200,
+                                  decoration: const BoxDecoration(
+                                    gradient: LinearGradient(
                                       colors: [
-                                        Color(0xFFFFFFFF),
-                                        Color(0xFFF5F7FA),
+                                        Color(0xFF1976D2),
+                                        Color(0xFF42A5F5),
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                     ),
                                   ),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(20),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        const Text(
-                                          'Thông tin cá nhân',
-                                          style: TextStyle(
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold,
-                                            fontFamily: 'Roboto',
-                                            color: Color(0xFF1976D2),
-                                          ),
-                                        ),
-                                        const SizedBox(height: 16),
-                                        _buildProfileItem(
-                                          icon: Icons.badge,
-                                          label: 'Mã sinh viên',
-                                          value: _student!.studentCode,
-                                        ),
-                                        const Divider(
-                                          height: 20,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildProfileItem(
-                                          icon: Icons.person,
-                                          label: 'Họ tên',
-                                          value: _student!.fullName,
-                                        ),
-                                        const Divider(
-                                          height: 20,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildProfileItem(
-                                          icon: Icons.transgender,
-                                          label: 'Giới tính',
-                                          value: _student!.gender
-                                              .toString()
-                                              .split('.')
-                                              .last,
-                                        ),
-                                        const Divider(
-                                          height: 20,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildProfileItem(
-                                          icon: Icons.cake,
-                                          label: 'Ngày sinh',
-                                          value: _student!.dateOfBirth
-                                              .toString()
-                                              .split(' ')[0],
-                                        ),
-                                        const Divider(
-                                          height: 20,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildProfileItem(
-                                          icon: Icons.location_on,
-                                          label: 'Nơi sinh',
-                                          value: _student!.placeOfBirth,
-                                        ),
-                                        const Divider(
-                                          height: 20,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildProfileItem(
-                                          icon: Icons.class_,
-                                          label: 'Lớp',
-                                          value: _student!.className,
-                                        ),
-                                        const Divider(
-                                          height: 20,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildProfileItem(
-                                          icon: Icons.calendar_today,
-                                          label: 'Năm nhập học',
-                                          value: _student!.intakeYear
-                                              .toString(),
-                                        ),
-                                        const Divider(
-                                          height: 20,
-                                          color: Colors.grey,
-                                        ),
-                                        _buildProfileItem(
-                                          icon: Icons.school,
-                                          label: 'Chuyên ngành',
-                                          value: _student!.major,
-                                        ),
-                                      ],
+                                  child: Center(
+                                    child: CircleAvatar(
+                                      radius: 60,
+                                      backgroundImage:
+                                          _student!.profileImage.isNotEmpty
+                                              ? NetworkImage(_student!.profileImage)
+                                              : null,
+                                      backgroundColor: Colors.white,
+                                      child: _student!.profileImage.isEmpty
+                                          ? const Icon(
+                                              Icons.person,
+                                              size: 60,
+                                              color: Color(0xFF1976D2),
+                                            )
+                                          : null,
                                     ),
                                   ),
                                 ),
-                              ),
+                                Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Card(
+                                    elevation: 4,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(16),
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xFFFFFFFF),
+                                            Color(0xFFF5F7FA),
+                                          ],
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                        ),
+                                      ),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(20),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            const Text(
+                                              'Thông tin cá nhân',
+                                              style: TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.bold,
+                                                fontFamily: 'Roboto',
+                                                color: Color(0xFF1976D2),
+                                              ),
+                                            ),
+                                            const SizedBox(height: 16),
+                                            _buildProfileItem(
+                                              icon: Icons.badge,
+                                              label: 'Mã sinh viên',
+                                              value: _student!.studentCode,
+                                            ),
+                                            const Divider(
+                                              height: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            _buildProfileItem(
+                                              icon: Icons.person,
+                                              label: 'Họ tên',
+                                              value: _student!.fullName,
+                                            ),
+                                            const Divider(
+                                              height: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            _buildProfileItem(
+                                              icon: Icons.transgender,
+                                              label: 'Giới tính',
+                                              value: _student!.gender
+                                                  .toString()
+                                                  .split('.')
+                                                  .last,
+                                            ),
+                                            const Divider(
+                                              height: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            _buildProfileItem(
+                                              icon: Icons.cake,
+                                              label: 'Ngày sinh',
+                                              value: _student!.dateOfBirth
+                                                  .toString()
+                                                  .split(' ')[0],
+                                            ),
+                                            const Divider(
+                                              height: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            _buildProfileItem(
+                                              icon: Icons.location_on,
+                                              label: 'Nơi sinh',
+                                              value: _student!.placeOfBirth,
+                                            ),
+                                            const Divider(
+                                              height: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            _buildProfileItem(
+                                              icon: Icons.class_,
+                                              label: 'Lớp',
+                                              value: _student!.className,
+                                            ),
+                                            const Divider(
+                                              height: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            _buildProfileItem(
+                                              icon: Icons.calendar_today,
+                                              label: 'Năm nhập học',
+                                              value: _student!.intakeYear
+                                                  .toString(),
+                                            ),
+                                            const Divider(
+                                              height: 20,
+                                              color: Colors.grey,
+                                            ),
+                                            _buildProfileItem(
+                                              icon: Icons.school,
+                                              label: 'Chuyên ngành',
+                                              value: _student!.major,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
+                          ),
               ],
             ),
           ),
@@ -784,7 +786,7 @@ class ChatListScreen extends StatefulWidget {
   final UserRole role;
 
   const ChatListScreen({Key? key, required this.userId, required this.role})
-    : super(key: key);
+      : super(key: key);
 
   @override
   State<ChatListScreen> createState() => _ChatListScreenState();
@@ -792,7 +794,8 @@ class ChatListScreen extends StatefulWidget {
 
 class _ChatListScreenState extends State<ChatListScreen> {
   final _chatboxDBHelper = ChatboxDBHelper();
-  List<BoxChat> _boxChats = [];
+  final _requestDBHelper = RequestDBHelper();
+  List<Map<String, dynamic>> _boxChatsWithTitles = [];
   bool _isLoading = true;
 
   @override
@@ -805,8 +808,18 @@ class _ChatListScreenState extends State<ChatListScreen> {
     setState(() => _isLoading = true);
     try {
       final boxChats = await _chatboxDBHelper.getBoxChatsByUser(widget.userId);
+      final List<Map<String, dynamic>> boxChatsWithTitles = [];
+
+      for (var boxChat in boxChats) {
+        final request = await _requestDBHelper.getRequestById(boxChat.requestId);
+        boxChatsWithTitles.add({
+          'boxChat': boxChat,
+          'title': request?.title ?? 'Không có tiêu đề',
+        });
+      }
+
       setState(() {
-        _boxChats = boxChats;
+        _boxChatsWithTitles = boxChatsWithTitles;
         _isLoading = false;
       });
     } catch (e) {
@@ -854,93 +867,95 @@ class _ChatListScreenState extends State<ChatListScreen> {
                 strokeWidth: 3,
               ),
             )
-          : _boxChats.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(
-                    Icons.chat_bubble_outline,
-                    size: 80,
-                    color: Color(0xFFFBC02D),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Không có hộp thoại nào',
-                    style: TextStyle(
-                      fontFamily: 'Roboto',
-                      fontSize: 18,
-                      color: Colors.black54,
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : ListView.builder(
-              itemCount: _boxChats.length,
-              padding: const EdgeInsets.all(16),
-              itemBuilder: (context, index) {
-                final boxChat = _boxChats[index];
-                return Card(
-                  elevation: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(16),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ChatScreen(
-                            userId: widget.userId,
-                            receiverId: boxChat.senderUserId == widget.userId
-                                ? boxChat.receiverUserId
-                                : boxChat.senderUserId,
-                            boxChatId: boxChat.boxChatId,
-                            role: widget.role,
-                          ),
+          : _boxChatsWithTitles.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(
+                        Icons.chat_bubble_outline,
+                        size: 80,
+                        color: Color(0xFFFBC02D),
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Không có hộp thoại nào',
+                        style: TextStyle(
+                          fontFamily: 'Roboto',
+                          fontSize: 18,
+                          color: Colors.black54,
                         ),
-                      );
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
+                      ),
+                    ],
+                  ),
+                )
+              : ListView.builder(
+                  itemCount: _boxChatsWithTitles.length,
+                  padding: const EdgeInsets.all(16),
+                  itemBuilder: (context, index) {
+                    final boxChatData = _boxChatsWithTitles[index];
+                    final boxChat = boxChatData['boxChat'] as BoxChat;
+                    final title = boxChatData['title'] as String;
+                    return Card(
+                      elevation: 4,
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFFFFFFFF), Color(0xFFF5F7FA)],
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                        ),
                       ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.all(16),
-                        title: Text(
-                          'Hộp thoại #${boxChat.boxChatId}',
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            fontWeight: FontWeight.w600,
-                            fontSize: 16,
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ChatScreen(
+                                userId: widget.userId,
+                                receiverId: boxChat.senderUserId == widget.userId
+                                    ? boxChat.receiverUserId
+                                    : boxChat.senderUserId,
+                                boxChatId: boxChat.boxChatId,
+                                role: widget.role,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(16),
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFFFFFFFF), Color(0xFFF5F7FA)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.all(16),
+                            title: Text(
+                              title,
+                              style: const TextStyle(
+                                fontFamily: 'Roboto',
+                                fontWeight: FontWeight.w600,
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Hộp thoại #${boxChat.boxChatId}',
+                              style: const TextStyle(
+                                fontFamily: 'Roboto',
+                                color: Colors.black54,
+                              ),
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios,
+                              size: 16,
+                              color: Color(0xFF1976D2),
+                            ),
                           ),
                         ),
-                        subtitle: Text(
-                          'Yêu cầu ID: ${boxChat.requestId}',
-                          style: const TextStyle(
-                            fontFamily: 'Roboto',
-                            color: Colors.black54,
-                          ),
-                        ),
-                        trailing: const Icon(
-                          Icons.arrow_forward_ios,
-                          size: 16,
-                          color: Color(0xFF1976D2),
-                        ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
     );
   }
 }
@@ -950,7 +965,7 @@ class ChatMessage extends StatelessWidget {
   final String answer;
 
   const ChatMessage({required this.question, required this.answer, Key? key})
-    : super(key: key);
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
