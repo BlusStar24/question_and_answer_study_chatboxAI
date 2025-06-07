@@ -4,6 +4,7 @@ import '../../chat_view.dart';
 import '../../database/teacher_table.dart';
 import '../../database/box_chat_table.dart';
 import '../../database/models.dart';
+import '../teacher/form_downloads_view.dart';
 
 // Define _FeatureCardData before _TeacherScreenState
 class _FeatureCardData {
@@ -120,7 +121,13 @@ class _TeacherScreenState extends State<TeacherScreen> {
               ChatListScreen(userId: widget.userId, role: UserRole.teacher),
         ),
       );
-    } else {}
+    } else if (_features[index].title == 'Tải biểu mẫu') {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const DownloadFormsScreen()),
+      );
+    }
+    else {}
   }
 
   @override
